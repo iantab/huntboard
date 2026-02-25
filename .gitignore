@@ -87,3 +87,4 @@ desktop.ini
 *.pem
 coverage/
 .nyc_output/
+lint.json
