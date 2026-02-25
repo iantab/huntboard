@@ -13,7 +13,7 @@ export const authApi = {
   },
 
   refresh: async (refresh: string) => {
-    const response = await api.post<{ access: string }>(
+    const response = await api.post<{ access: string; refresh?: string }>(
       "/api/v1/auth/token/refresh/",
       { refresh },
     );

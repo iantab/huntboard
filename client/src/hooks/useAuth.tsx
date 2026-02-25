@@ -42,8 +42,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       try {
         if (storedRefresh) {
-          const { access } = await authApi.refresh(storedRefresh);
-          setTokens(access, storedRefresh);
+          const { access, refresh } = await authApi.refresh(storedRefresh);
+          const newRefresh = refresh || storedRefresh;
+          setTokens(access, newRefresh);
+          if (refresh) {
+            localStorage.setItem("huntboard_refresh", refresh);
+          }
           const currentUser = await authApi.getMe();
           setUser(currentUser);
         }
@@ -72,14 +76,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           try {
             // If backend uses cookies, this will still work assuming withCredentials is true
-            const response = await api.post<{ access: string }>(
-              "/api/v1/auth/token/refresh/",
-              {
-                refresh: refresh || undefined, // Send if we have it manually stored
-              },
-            );
-            const { access } = response.data;
-            setTokens(access, refresh);
+            const response = await api.post<{
+              access: string;
+              refresh?: string;
+            }>("/api/v1/auth/token/refresh/", {
+              refresh: refresh || undefined, // Send if we have it manually stored
+            });
+            const { access, refresh: newRefresh } = response.data;
+            const finalRefresh = newRefresh || refresh;
+            setTokens(access, finalRefresh);
+            if (newRefresh) {
+              localStorage.setItem("huntboard_refresh", newRefresh);
+            }
             originalRequest.headers.Authorization = `Bearer ${access}`;
             return api(originalRequest);
           } catch (refreshError) {
