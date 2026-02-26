@@ -35,7 +35,7 @@ export function Drawer({
   return createPortal(
     <div className="fixed inset-0 z-50 overflow-hidden">
       <div
-        className="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+        className="absolute inset-0 backdrop-blur-sm bg-black/20 transition-opacity"
         onClick={onClose}
       />
       <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">

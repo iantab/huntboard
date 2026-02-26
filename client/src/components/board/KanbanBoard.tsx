@@ -11,6 +11,7 @@ import type { DragStartEvent, DragEndEvent } from "@dnd-kit/core";
 import { KanbanColumn } from "./KanbanColumn";
 import { ApplicationCard } from "./ApplicationCard";
 import { ApplicationDrawer } from "../application/ApplicationDrawer";
+import { CreateApplicationModal } from "../application/CreateApplicationModal";
 import {
   useApplications,
   useUpdateApplicationStatus,
@@ -50,6 +51,10 @@ export function KanbanBoard({ filters }: KanbanBoardProps) {
   const [selectedApplication, setSelectedApplication] =
     useState<Application | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // Create modal state
+  const [createModalStatus, setCreateModalStatus] =
+    useState<ApplicationStatus | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -119,6 +124,7 @@ export function KanbanBoard({ filters }: KanbanBoardProps) {
                   (app: Application) => app.status === col.id,
                 )}
                 onCardClick={handleCardClick}
+                onAddClick={(status) => setCreateModalStatus(status)}
               />
             ))}
           </div>
@@ -135,6 +141,12 @@ export function KanbanBoard({ filters }: KanbanBoardProps) {
         application={selectedApplication}
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
+      />
+
+      <CreateApplicationModal
+        isOpen={createModalStatus !== null}
+        onClose={() => setCreateModalStatus(null)}
+        initialStatus={createModalStatus ?? "wishlist"}
       />
     </>
   );

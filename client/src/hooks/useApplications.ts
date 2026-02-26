@@ -6,6 +6,17 @@ import type {
   PaginatedResponse,
 } from "../types";
 
+export function useCreateApplication() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: Partial<Application>) => applicationsApi.create(data),
+    onSettled: () => {
+      queryClient.refetchQueries({ queryKey: ["applications"] });
+    },
+  });
+}
+
 export function useApplications(params?: Record<string, string | number>) {
   return useQuery({
     queryKey: ["applications", params],
@@ -29,6 +40,29 @@ export function useUpdateApplication() {
             results: old.results.map((app: Application) =>
               app.id === updatedApp.id ? updatedApp : app,
             ),
+          };
+        },
+      );
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["applications"] });
+    },
+  });
+}
+
+export function useDeleteApplication() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => applicationsApi.delete(id),
+    onSuccess: (_data, id) => {
+      queryClient.setQueriesData(
+        { queryKey: ["applications"] },
+        (old: PaginatedResponse<Application> | undefined) => {
+          if (!old || !old.results) return old;
+          return {
+            ...old,
+            results: old.results.filter((app: Application) => app.id !== id),
           };
         },
       );

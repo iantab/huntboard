@@ -1,7 +1,11 @@
 import { Drawer } from "../ui/Drawer";
 import { Textarea } from "../ui/Textarea";
 import { StatusBadge } from "../ui/Badge";
-import { useUpdateApplication } from "../../hooks/useApplications";
+import { Button } from "../ui/Button";
+import {
+  useUpdateApplication,
+  useDeleteApplication,
+} from "../../hooks/useApplications";
 import type { Application } from "../../types";
 
 interface ApplicationDrawerProps {
@@ -16,6 +20,8 @@ export function ApplicationDrawer({
   onClose,
 }: ApplicationDrawerProps) {
   const { mutate: updateApplication } = useUpdateApplication();
+  const { mutate: deleteApplication, isPending: isDeleting } =
+    useDeleteApplication();
 
   if (!application) return null;
 
@@ -91,6 +97,20 @@ export function ApplicationDrawer({
         {/* TODO: Contacts, Interviews, and Status History accordions */}
         <div className="rounded-lg border border-dashed border-gray-300 p-8 text-center text-sm text-gray-500">
           Contacts and Interview Logs coming soon.
+        </div>
+
+        {/* Delete */}
+        <div className="pt-4 border-t border-gray-100">
+          <Button
+            variant="ghost"
+            className="w-full text-red-600 hover:bg-red-50 hover:text-red-700"
+            disabled={isDeleting}
+            onClick={() =>
+              deleteApplication(application.id, { onSuccess: onClose })
+            }
+          >
+            {isDeleting ? "Deleting…" : "Delete application"}
+          </Button>
         </div>
       </div>
     </Drawer>
